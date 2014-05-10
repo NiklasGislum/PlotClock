@@ -150,16 +150,13 @@ void loop()
 
   
 #ifdef CALIBRATION
-
-  erase();
-
   // Servohorns will have 90° between movements, parallel to x and y axis
-/*
+
   drawTo(-3, 29.2);
   delay(500);
   drawTo(74.1, 28);
   delay(500);
- */
+
 
 #else 
 
