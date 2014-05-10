@@ -17,10 +17,11 @@
 // delete or mark the next line as comment if you don't need these
 //#define REALTIMECLOCK    // enable real time clock
 
-// Create a file called calibration.h with the 
+// Create a file called calibration.h with the robot-specific values
 #include "calibration.h"
 
 /*
+This is the content that your calibration.h file should have:
 //#define CALIBRATION      // enable calibration mode
 
 #define SERVOFAKTORLEFT 590
