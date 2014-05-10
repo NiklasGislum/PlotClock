@@ -15,21 +15,13 @@
 //       - see http://www.pjrc.com/teensy/td_libs_DS1307RTC.html for how to hook up the real time clock 
 
 // delete or mark the next line as comment if you don't need these
-//#define CALIBRATION      // enable calibration mode
 //#define REALTIMECLOCK    // enable real time clock
 
+// Create a file called calibration.h with the 
+#include <calibration.h>
+
 /*
-// When in calibration mode, adjust the following factor until the servos move exactly 90 degrees
-#define SERVOFAKTORLEFT 550
-#define SERVOFAKTORRIGHT 560
-
-// Zero-position of left and right servo
-// When in calibration mode, adjust the NULL-values so that the servo arms are at all times parallel
-// either to the X or Y axis
-#define SERVOLEFTNULL 2420
-#define SERVORIGHTNULL 955
-*/
-
+//#define CALIBRATION      // enable calibration mode
 
 #define SERVOFAKTORLEFT 590
 #define SERVOFAKTORRIGHT 600
@@ -39,6 +31,14 @@
 // either to the X or Y axis
 #define SERVOLEFTNULL 2320
 #define SERVORIGHTNULL 1010
+
+
+#define LIFT0 1150 // on drawing surface
+#define LIFT1 825  // between numbers
+#define LIFT2 725  // going towards sweeper
+
+*/
+
 
 
 // GPIO pins that the servos are connected to:
@@ -52,9 +52,6 @@
 #define LIFT1 925  // between numbers
 #define LIFT2 725  // going towards sweeper
 */
-#define LIFT0 1150 // on drawing surface
-#define LIFT1 825  // between numbers
-#define LIFT2 725  // going towards sweeper
 
 // speed of liftimg arm, higher is slower
 #define LIFTSPEED 1500
