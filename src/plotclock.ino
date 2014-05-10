@@ -15,7 +15,7 @@
 //       - see http://www.pjrc.com/teensy/td_libs_DS1307RTC.html for how to hook up the real time clock 
 
 // delete or mark the next line as comment if you don't need these
-#define CALIBRATION      // enable calibration mode
+//#define CALIBRATION      // enable calibration mode
 //#define REALTIMECLOCK    // enable real time clock
 
 /*
@@ -41,10 +41,8 @@
 #define SERVORIGHTNULL 1010
 
 
-// Was 2:
+// GPIO pins that the servos are connected to:
 #define SERVOPINLIFT  6
-
-// was 3:
 #define SERVOPINLEFT  5
 #define SERVOPINRIGHT 4
 
@@ -135,13 +133,16 @@ void setup()
 #endif
 
   servoLift = LIFT0;
-
+  lift(2);
+  servo1.attach(SERVOPINLIFT);  //  lifting servo
+  delay(1000); // Wait for the pen to be raised
+  servo2.attach(SERVOPINLEFT);  //  left servo
+  servo3.attach(SERVOPINRIGHT);  //  right servo
+ 
   lift(2);
   drawTo(PARK_X, PARK_Y);
   lift(0);
-  servo1.attach(SERVOPINLIFT);  //  lifting servo
-  servo2.attach(SERVOPINLEFT);  //  left servo
-  servo3.attach(SERVOPINRIGHT);  //  right servo
+
   delay(1000);
 
 } 
@@ -181,6 +182,8 @@ void loop()
     }
 
     erase();
+    lift(2);
+
     drawChar(5, 25, i, 0.9);
     drawChar(19, 25, (hour()-i*10), 0.9);
     drawChar(28, 25, COLON, 0.9);
@@ -193,8 +196,8 @@ void loop()
     drawChar(34, 25, i, 0.9);
     drawChar(48, 25, (minute()-i*10), 0.9);
     lift(2);
-    drawTo(74.2, 47.5);
-    lift(1);
+    drawTo(PARK_X, PARK_Y);
+    lift(0);
     last_min = minute();
 
     servo1.detach();
@@ -209,7 +212,6 @@ void loop()
 // Writing numeral with bx by being the bottom left originpoint. Scale 1 equals a 20 mm high font.
 // The structure follows this principle: move to first startpoint of the numeral, lift down, draw numeral, lift up
 void drawChar(float bx, float by, int num, float scale) {
-
   switch (num) {
 
   case 0:
@@ -302,7 +304,6 @@ void drawChar(float bx, float by, int num, float scale) {
 
 
 void erase() {
-  lift(2);
 
   int y = PARK_Y;
   drawTo(PARK_X, y);  
