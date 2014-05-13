@@ -304,12 +304,15 @@ void erase() {
   drawTo(PARK_X, y);  
   lift(0);
   
+  drawTo(5, y);
+  y = PARK_Y+10;
+  
   while (y > 15) {
     drawTo(5, y);
-    y -= 5;
+    y -= 3;
     drawTo(5, y);       
     drawTo(PARK_X-10, y);       
-    y -= 5;
+    y -= 3;
     drawTo(PARK_X-10, y);       
   }
 
@@ -335,13 +338,13 @@ void lift(char lift) {
         servo1.writeMicroseconds(servoLift);				
         delayMicroseconds(LIFTSPEED);
       }
-    } else {
+  } else {
       while (servoLift <= targetLift) {
         servoLift++;
         servo1.writeMicroseconds(servoLift);
         delayMicroseconds(LIFTSPEED);
       }
-    } 
+  } 
 }
 
 
@@ -401,34 +404,38 @@ double return_angle(double a, double b, double c) {
 void set_XY(double Tx, double Ty) 
 {
   delay(1);
-  double dx, dy, c, a1, a2, Hx, Hy;
 
-  // calculate triangle between pen, servoLeft and arm joint
-  // cartesian dx/dy
-  dx = Tx - O1X;
-  dy = Ty - O1Y;
+  double cLeft, a1Left;
+  {
+    // calculate triangle between pen, servoLeft and arm joint
+    // cartesian dx/dy
+    double dx = Tx - O1X;
+    double dy = Ty - O1Y;
+  
+    // polar length (c) and angle (a1)
+    cLeft = sqrt(dx * dx + dy * dy); // 
+    a1Left = atan2(dy, dx); //
+    double a2 = return_angle(L1, L2, cLeft);
+  
+    servo2.writeMicroseconds(floor(((a2 + a1Left - M_PI) * SERVOFAKTORLEFT) + SERVOLEFTNULL));
+  }
 
-  // polar lemgth (c) and angle (a1)
-  c = sqrt(dx * dx + dy * dy); // 
-  a1 = atan2(dy, dx); //
-  a2 = return_angle(L1, L2, c);
-
-  servo2.writeMicroseconds(floor(((a2 + a1 - M_PI) * SERVOFAKTORLEFT) + SERVOLEFTNULL));
-
-  // calculate joinr arm point for triangle of the right servo arm
-  a2 = return_angle(L2, L1, c);
-  Hx = Tx + L3 * cos((a1 - a2 + 0.621) + M_PI); //36,5°
-  Hy = Ty + L3 * sin((a1 - a2 + 0.621) + M_PI);
-
-  // calculate triangle between pen joint, servoRight and arm joint
-  dx = Hx - O2X;
-  dy = Hy - O2Y;
-
-  c = sqrt(dx * dx + dy * dy);
-  a1 = atan2(dy, dx);
-  a2 = return_angle(L1, (L2 - L3), c);
-
-  servo3.writeMicroseconds(floor(((a1 - a2) * SERVOFAKTORRIGHT) + SERVORIGHTNULL));
+  {
+    // calculate joinr arm point for triangle of the right servo arm
+    double a2 = return_angle(L2, L1, cLeft);
+    double Hx = Tx + L3 * cos((a1Left - a2 + 0.621) + M_PI); //36,5°
+    double Hy = Ty + L3 * sin((a1Left - a2 + 0.621) + M_PI);
+  
+    // calculate triangle between pen joint, servoRight and arm joint
+    double dx = Hx - O2X;
+    double dy = Hy - O2Y;
+  
+    double c = sqrt(dx * dx + dy * dy);
+    double a1 = atan2(dy, dx);
+    a2 = return_angle(L1, (L2 - L3), c);
+  
+    servo3.writeMicroseconds(floor(((a1 - a2) * SERVOFAKTORRIGHT) + SERVORIGHTNULL));
+  }
 
 }
 
