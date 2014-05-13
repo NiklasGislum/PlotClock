@@ -127,7 +127,7 @@ void setup()
   }
 #else  
   // Set current time only the first to values, hh,mm are needed
-  setTime(19,38,0,0,0,0);
+  setTime(16,51,0,0,0,0);
 #endif
 
   servoLift = LIFT0;
@@ -311,9 +311,9 @@ void erase() {
     drawTo(5, y);
     y -= 3;
     drawTo(5, y);       
-    drawTo(PARK_X-10, y);       
+    drawTo(PARK_X-15, y);       
     y -= 3;
-    drawTo(PARK_X-10, y);       
+    drawTo(PARK_X-15, y);       
   }
 
   drawTo(5, PARK_Y-10);       
