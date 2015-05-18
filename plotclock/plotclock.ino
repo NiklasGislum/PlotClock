@@ -17,6 +17,10 @@
 // delete or mark the next line as comment if you don't need these
 //#define REALTIMECLOCK    // enable real time clock
 
+// delete or mark the next line as comment if you don't need these
+#include <Stepper.h>
+#define ALARM    // enable the alarm
+#define SERIALOUTPUT // outputs the servor values to serial
 // Create a file called calibration.h with the robot-specific values
 #include "calibration.h"
 
@@ -88,6 +92,10 @@ This is the content that your calibration.h file should have:
   #include <DS1307RTC.h> // see http://playground.arduino.cc/Code/time    
 #endif
 
+#ifdef ALARM
+	#include <TimeAlarms.h>
+#endif
+
 int servoLift = 1500;
 
 Servo servo1;  // 
@@ -97,12 +105,16 @@ Servo servo3;  //
 volatile double lastX = PARK_X;
 volatile double lastY = PARK_Y;
 
+ int servo1ValRad;
+ int servo2ValRad;
+ int servo3ValRad;
+
 int last_min = 0;
 
 void setup() 
 { 
 #ifdef REALTIMECLOCK
-  Serial.begin(9600);
+  Serial.begin(115200);
   //while (!Serial) { ; } // wait for serial port to connect. Needed for Leonardo only
 
   // Set current time only the first to values, hh,mm are needed  
@@ -127,7 +139,15 @@ void setup()
   }
 #else  
   // Set current time only the first to values, hh,mm are needed
-  setTime(16,51,0,0,0,0);
+  setTime(10,01,0,0,0,0);
+#endif
+
+#ifdef ALARM
+  Alarm.alarmRepeat(10, 8, 0, alarmAction);
+#endif
+
+#ifdef SERIALOUTPUT
+  Serial.begin(9600);
 #endif
 
   servoLift = LIFT0;
@@ -142,7 +162,6 @@ void setup()
   lift(0);
 
   delay(1000);
-
 } 
 
 void loop() 
@@ -164,9 +183,9 @@ void loop()
   int i = 0;
   if (last_min != minute()) {
 
-    if (!servo1.attached()) servo1.attach(SERVOPINLIFT);
-    if (!servo2.attached()) servo2.attach(SERVOPINLEFT);
-    if (!servo3.attached()) servo3.attach(SERVOPINRIGHT);
+	  if (!servo1.attached()) servo1.attach(SERVOPINLIFT);
+	  if (!servo2.attached()) servo2.attach(SERVOPINLEFT);
+	  if (!servo3.attached()) servo3.attach(SERVOPINRIGHT);
 
     lift(0);
 
@@ -337,16 +356,32 @@ void lift(char lift) {
         servoLift--;
         servo1.writeMicroseconds(servoLift);				
         delayMicroseconds(LIFTSPEED);
-      }
+		servo1ValRad =map(servo1ValRad,600,2400,-90,90);
+      } 
   } else {
       while (servoLift <= targetLift) {
         servoLift++;
         servo1.writeMicroseconds(servoLift);
         delayMicroseconds(LIFTSPEED);
+		servo1ValRad = map(servo1ValRad, 600, 2400, -90, 90);
       }
   } 
 }
 
+
+void alarmAction()
+{
+	lift(2);
+	drawTo(0,0);
+	int numOfAlarms;
+
+	for (int i = 0; i < numOfAlarms; i++)
+	{
+		drawTo(5, 5);
+		delay(10000);
+		drawTo(0,0);
+	}
+}
 
 void bogenUZS(float bx, float by, float radius, int start, int ende, float sqee) {
   float inkr = -0.05;
@@ -418,6 +453,8 @@ void set_XY(double Tx, double Ty)
     double a2 = return_angle(L1, L2, cLeft);
   
     servo2.writeMicroseconds(floor(((a2 + a1Left - M_PI) * SERVOFAKTORLEFT) + SERVOLEFTNULL));
+	//servo2ValRad = map((floor(((a2 + a1Left - M_PI) * SERVOFAKTORLEFT) + SERVOLEFTNULL)),600,2400,-90,90);
+	//servo2ValRad = (floor(((a2 + a1Left - M_PI) * SERVOFAKTORLEFT) + SERVOLEFTNULL));
   }
 
   {
@@ -435,8 +472,12 @@ void set_XY(double Tx, double Ty)
     a2 = return_angle(L1, (L2 - L3), c);
   
     servo3.writeMicroseconds(floor(((a1 - a2) * SERVOFAKTORRIGHT) + SERVORIGHTNULL));
+	//servo3ValRad = map((floor(((a1 - a2) * SERVOFAKTORRIGHT) + SERVORIGHTNULL)),600,2400,-90,90);
+	//servo3ValRad = (floor(((a1 - a2) * SERVOFAKTORRIGHT) + SERVORIGHTNULL));
   }
-
+#ifdef SERIALOUTPUT
+  Serial.println(String(servo1ValRad) + ";" + String(servo2ValRad) + ";" + String(servo3ValRad));
+#endif
 }
 
 
